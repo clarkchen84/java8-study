@@ -43,3 +43,15 @@
 3. 高阶函数
 
    1. 如果一个函数接收一个函数作为参数，或者返回一个参数当作返回值那个这个函数就是一个高阶函数
+
+      ​	当function为function<x,y>的场合
+
+      * compose 相当于 compose(g< m, x> before 如果 1. y=f(x), 2. x= g(m), 3. y = f(g(m) 
+      * andThen 相当于andThen(Function<y, m> after)  如果 1. y=f(x) 2.m=g(y) ,3. m=g(f(x))
+
+
+
+### BiFunction
+
+
+
