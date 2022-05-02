@@ -1,4 +1,4 @@
-package sizhe.chen.jdk8;
+package com.example.jdk8.function;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
