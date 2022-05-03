@@ -59,7 +59,6 @@
       * 提升抽象的层次
       * API 重用性更好， 更加灵活
 ### 函数式接口
-
 1. 一个接口被@FunctionalInterface是函数式接口
    * java.lang.FunctionalInterface 
    * 标识所声明的接⼝为函数式接⼝ 
@@ -80,7 +79,17 @@
 6. FunctionalInterface 的例子参考`FunctionalInterFaceDefinition`
 
 7. 如何通过自定义的FunctionalInterface 完成Lambda 表达式的使用参考`FunctionalInterfaceTest`
-
+### 默认方法
+1. jdk 8 为接口追加了可以实现的方法。 这种方法在接口中使用default 修饰符 修饰方法 参考事例`MyClass`，目的是为了实现向后兼容。
+   由于java 8 追加了大量函数式方法，为了实现这些功能而不影响Java8以前的版本，所以追加了default method
+2. 当一个类同时实现两个接口。 当这两个接口有两个相同的方法名的时候， 究竟使用哪一个呢？ 参考例子`DuplicatedImplementsDemo`
+    * 对于这种问题， 需要显示的调用 `目标父接口.super.默认方法名` 或者直接在子类中自己实现该方法
+3. 如何处理菱形继承问题。类似与C++ 多重继承问题。java 的解决方案
+    ![菱形继承问题](./image/DefaultMethodInheritProblem.png)
+    ![菱形继承问题](./image/DefaultMethodInheritProblem2.png)
+   * 首先，类或父类中显式声明的方法，其优先级高于所有的默认方法。 
+   * 如果用第一条无法判断，方法签名又没有区别，那么选择提供最具体实现的默认方法的接口。
+   * 最后，如果冲突依旧无法解决，你就只能在你的类中覆盖该默认方法，显式地指定在你的类中使用哪一个接口中的方法。
 ### 方法引用
 1. 方法引用是lambda 表达是的一个语法糖，在很多时候， 如果一个lambda 表达式能够实现的功能，如果使用一个方法能够实现， 
    那么就可以 使用方法引用的方式来实现，使方代码更加清晰简洁。 参考例子 `MethodReferenceDemo`
@@ -191,9 +200,60 @@
             ```
 5. Optional 还有一些方法，例如`Stream`，`map`，`flatMap`与后面介绍的Stream方式相同。 小例子`OptionalOtherUserDemo`。具体使用的方法参考下面的Stream 介绍
 
+### Stream 流
+1. Stream 的概念： stream是一些元素，支持一系列串行或者并行操作 。(1. 不是java IO 中的流 2. 可以把java 8中的流想象成linux 中的管道（pipeline），一个操作的结果是下一个操作的数据源) 例
+    ``` Java
+    int sum = widgets.stream()
+                  .filter(w -> w.getColor() == RED)
+                  .mapToInt(w -> w.getWeight())
+                  .sum();
+    ```
+   * 流有哪些特点： 它允许以声明性方式处理数据集合（通过查询语句来表达，而不是临时编写一个实现）。就现在来说，可以把它们看成遍历数据集的高级迭代器。
+     此外，流还可以透明地并行处理，你无需写任何多线程代码
+   * Java8 以前的方式 处理集合 与java 8使用流的方式处理集合进行比较
+        1. java8 以前的版本
+            ``` java
+            List<Dish>lowCaloricDishes=newArrayList<>();
+            for(Dishd:menu){
+                if(d.getCalories()<400){//←─用累加器筛选元素
+                    lowCaloricDishes.add(d);
+                }
+            }
+            Collections.sort(lowCaloricDishes,
+                new Comparator<Dish>(){//←─用匿名类对菜肴排序
+                    public int compare(Dishd1,Dishd2){
+                        returnInteger.compare(d1.getCalories(),d2.getCalories());
+                }
+            });
+            List<String> lowCaloricDishesName=new ArrayList<>();
+            for(Dish d:lowCaloricDishes){
+                lowCaloricDishesName.add(d.getName());//←─处理排序后的菜名列表
+            }
+            ```
+        2. java 8 的版本
+           ``` java
+            List<String> lowCaloricDishesName= menu.stream()
+                                                //parallelStream() //   轻松实现并发版本  
+
+                        .filter(d ->d.getCalories()<400)//←─选出400卡路里以下的菜肴
+                        .sorted(comparing(Dish::getCalories))//←─按照卡路里排序
+                        .map(Dish::getName)//←─提取菜肴的名称
+                        .collect(toList());//←─将所有名称保存在List中
+
+            ```
+2. 流的组成
+    1. 数据源（和不是DB的数据源的意思，指的是一些数据的集合）
+    2. 零个或多个中间操作
+    3. 终止操作
+3. 流操作的分类
+    1. 惰性求值 ： 对应流的组成中的0个或多个中间操作。
+    2. 及早求值 ： 对应的是终止操作。
+    * 例如 `stream.xxx().yyyy().count()` 其中`xxx().yyyy()` 就是惰性求值，`count()`就是及早求值
+    * 在终止操作执行（）之前， 这个流中的各个中间操作是不会执行的，所以这些中间操作是惰性求值。 只有当终止操作执行， 整个流才会执行。
+       
+#### 流的创建方式
+1. 事例`CreateStreamDemo`中列出了集中常见的创建流的方式
+2. IntStream (LongStream, DoubleStream)的创建方式
+    1. 由于原生类型 在进行拆箱和装箱操作的时候，会有很大的性能修好。所以java8的设计这专门设计了IntStream (LongStream, DoubleStream)
+    2. 除了Stream的集中创建方式之外， IntStream 还有自己的创建方式，参考事例`CreateIntStreamDemo`
     
-
-    
-
-
-
