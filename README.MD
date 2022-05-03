@@ -82,7 +82,19 @@
 7. 如何通过自定义的FunctionalInterface 完成Lambda 表达式的使用参考`FunctionalInterfaceTest`
 
 ### 方法引用
-
+1. 方法引用是lambda 表达是的一个语法糖，在很多时候， 如果一个lambda 表达式能够实现的功能，如果使用一个方法能够实现， 
+   那么就可以 使用方法引用的方式来实现，使方代码更加清晰简洁。 参考例子 `MethodReferenceDemo`
+    ``` Java
+    // lambda 表达是的方式
+    strs.forEach( item -> System.out.println(item));
+    // 方法引用的方式
+    strs.forEach(System.out::println);
+    ```
+2. 可以将方法引用看作是一个 【函数指针】，下面是方法引用的分类（一共四类）参考例子`MethodReferenceDemo`
+    1. 类名::静态方法名 
+    2. 对象::方法名
+    3. 类名::实例方法名
+    4. 构造方法引用: 类名::new 
 
 ### 常用的FunctionalInterface
 #### Consumer接口
