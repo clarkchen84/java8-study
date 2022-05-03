@@ -118,9 +118,68 @@
          3. m=g(f(x)) 最后的执行结果
 
 #### BiFunction
-   * 一个函数有两个输入一个输出，它是`Function`，他是function 接口的一个特化形式 (参考 `BiFunctionDemo`)
+* 一个函数有两个输入一个输出，它是`Function`，他是function 接口的一个特化形式 (参考 `BiFunctionDemo`)
 #### Predicate 
-   * 意思是断言（谓词），接受一个参数， 返回一个布尔值 参考`PredicateDemo`
+* 意思是断言（谓词），接受一个参数， 返回一个布尔值 参考`PredicateDemo`
+
+* 包含的几个重要的default 方法 ,参考`PredicateDefaultMethodDemo`
+    ``` java
+    default Predicate<T> and(Predicate<? super T> other) {
+        Objects.requireNonNull(other);
+        return (t) -> test(t) && other.test(t);
+    }
+     default Predicate<T> negate() {
+        return (t) -> !test(t);
+    }
+    default Predicate<T> or(Predicate<? super T> other) {
+        Objects.requireNonNull(other);
+        return (t) -> test(t) || other.test(t);
+    }
+    ```
+#### Supplier
+* 表示一个结果的供应者， 不接收参数， 返回一个对象 。参考demo `SupplierDemo`
+    * 在实际开发中，经常备用来当作工厂
+#### Optional
+1. Optional 是一个容器，里面可能包含了一个或这0个元素。如果调用`isPresent()`方法返回`true`，那么调用`get()`方法将返回Optional里面的值， 参考例子`OptionalDemo`
+2. Optional根据里面是否存在值还提供了一些额外的方法，如`orElse` 和`ifPresent`。 在真正的开发应用中， 这两个方法会经常用到
+3. 使用`Optional` 进行构造的的时候可以使用`of()` 方法和`ofNullable()`  ，但是使用`of()`进行构造的时候要保证参数是非空的，
+   否则会抛出NullPointException，实际开发中根据需要，如果取得参数中一定有值，可以使用`of()` 反之用`ofNullable()`构造
+   ``` java
+   Optional<String> optional = Optional.ofNullable("Hello");
+    Optional<String> optional2 = Optional.of("Hello")
+   ```
+4. Optional 的目标是为了解决空指针异常， java8 之前的方式和java8 的方式的比较参考例子`OptionalCompareDemo`
+    * 在java 8 之前 写程序需要向下面这样来防止空指针异常 
+      ``` java
+      if(null != person){
+        Address address = person.getAddress();
+        if(null != address){
+            ......
+        }
+      }  
+      ```
+    * 使用Java 8 的写法
+        1. 使用isPresent 和 get方法配合使用， 这种用法和java 8 之前的写法没有区别，所以在生产中基本不会使用这种方法
+        ``` java
+        if (optional.isPresent()){
+            System.out.println(optional.get());
+        }
+        ```
+        2. Optional 推荐使用函数是的编程风格，如下, 这也是在实际开发中经常使用的方法
+            1. 提供默认返回值的写法有下面java代码中的两种写法
+            ``` java
+            // 返回默认值
+            System.out.println(optional.orElse("default value"));
+            // 使用一个Supplier 当作参数，返回Supplier 提供的值
+            optional.orElseGet(() -> "default value");
+            ```
+            2. 使用`ifPreset`的写法. 如果Optional里面有值， 执行 ifPresent里面的`Consumer` 参数
+            ``` java 
+                optional.ifPresent(t -> System.out.println(t));
+            ```
+5. Optional 还有一些方法，例如`Stream`，`map`，`flatMap`与后面介绍的Stream方式相同。 小例子`OptionalOtherUserDemo`。具体使用的方法参考下面的Stream 介绍
+
+    
 
     
 
