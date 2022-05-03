@@ -17,11 +17,12 @@ import java.util.List;
 public class LoopTest {
     public static void main(String[] args) {
         List<Integer> integers = Arrays.asList(1,2,3,4,5,6,7,8,9,10);
-        // jdk 1.4 遍历集合的方法
+        // jdk 1.4 遍历集合的方法 外部迭代
         for (int i = 0; i < integers.size(); i++) {
             System.out.println(integers.get(i));
         }
         System.out.println("--------------------");
+        // java 1.5 的特性 外部迭代
         for (Integer i: integers) {
             System.out.println(i);
         }
@@ -30,6 +31,7 @@ public class LoopTest {
         System.out.println("--------------------");
         integers.forEach((Integer i) -> System.out.println(i));
         System.out.println("--------------------");
+        //java 1.8 内部迭代
         integers.forEach((Integer i) -> {
             System.out.println(i);// 使用执行体打括号的时候，必须要有分号
         });

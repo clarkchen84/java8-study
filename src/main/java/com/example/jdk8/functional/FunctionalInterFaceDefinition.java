@@ -1,4 +1,4 @@
-package com.example.jdk8.factional;
+package com.example.jdk8.functional;
 
 /**
  * 举例说明什么样的接口才是一个FunctionalInterface
