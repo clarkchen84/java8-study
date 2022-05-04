@@ -210,6 +210,10 @@
     ```
    * 流有哪些特点： 它允许以声明性方式处理数据集合（通过查询语句来表达，而不是临时编写一个实现）。就现在来说，可以把它们看成遍历数据集的高级迭代器。
      此外，流还可以透明地并行处理，你无需写任何多线程代码
+        1. 流不存储值， 通过管道的方式获取值
+        2. 本质函数式的，对流的操作会产生一个结果，不过并不会修改底层的数据源，集合可以作为流的底层数据源
+        3. 延迟查找，很多流操作（过滤，映射，排序）都是延迟的， 只有执行了终止操作，这些操作才会执行。
+     
    * Java8 以前的方式 处理集合 与java 8使用流的方式处理集合进行比较
         1. java8 以前的版本
             ``` java
@@ -256,4 +260,46 @@
 2. IntStream (LongStream, DoubleStream)的创建方式
     1. 由于原生类型 在进行拆箱和装箱操作的时候，会有很大的性能修好。所以java8的设计这专门设计了IntStream (LongStream, DoubleStream)
     2. 除了Stream的集中创建方式之外， IntStream 还有自己的创建方式，参考事例`CreateIntStreamDemo`
+#### 流的特点
+流操作有两个重要的特点。
+1. 流水线——很多流操作本身会返回一个流，这样多个操作就可以链接起来，形成一个大的流水线。
+2. 流水线的操作可以看作对数据源进行数据库式查询。内部迭代——与使用迭代器显式迭代的集合不同，流的迭代操作是在背后进行的。
+    * 内部迭代与外部迭代 参考下图
+    ![内部迭代与外部迭代](./image/InternalIterator.png)
+#### 流的基本操作
+
+| 操作类型  | 类型             | 返回类型    | 使用的类型/函数式接口 | 函数描述符   |
+| --------- | ---------------- | ----------- | --------------------- | ------------ |
+| filter    | 中间             | Stream<T>   | Predicate<T>          | T->boolean   |
+| distinct  | 中间(有状态无界) | Stream<T>   |                       |              |
+| skip      | 中间(有状态有界) | Stream<T>   | long                  |              |
+| limit     | 中间(有状态有界) | Stream<T>   | long                  |              |
+| map       | 中间             | Stream<R>   | Function<T,R>         | T->R         |
+| flatMap   | 中间             | Stream<R>   | Function<T,Stream<R>> | T->Stream<R> |
+| sorted    | 中间(有状态无界) | Stream<T>   | Comparator<T>         | (T,T)->int   |
+| anyMatch  | 终端             | boolean     | Predicate<T>          | T->boolean   |
+| noneMatch | 终端             | boolean     | Predicate<T>          | T->boolean   |
+| allMatch  | 终端             | boolean     | Predicate<T>          | T->boolean   |
+| findAny   | 终端             | Optional<T> |                       |              |
+| findFirst | 终端             | Optional<T> |                       |              |
+| forEach   | 终端             | void        | Consumer<T>           | T->void      |
+| collect   | 终端             | R           | Collector<T,A,R>      |              |
+| reduce    | 终端(有状态有界) | Optional<T> | BinaryOperator<T>     | (T,T)->T     |
+| count     | 终端             | long        |                       |              |
+
+* `map` 映射操作， 它会接受一个函数作为参数。这个函数会被应用到每个元素上，并将其映射成一个新的元素
+    * 参考例子`MappingDemo`
+      1. 将一组String类型的词组的首字母转换为大写
+      2. 求出每一个数字的平方
+* `flatMap` 流的扁平化映射，，flatmap方法把一个流中的每个值都换成另一个流，然后把所有的流连接起来成为一个流。(概念比较难理解，可以想象成把一个2维数组变为一个以为数组，在开发中会遇到flatMap的实际应用，需要掌握)
+    * 参考例子`FlatMapDemo`
+    
+* `findFirst` 从Stream中取得第一个元素 
+    * 参考例子`FindFirstDemo`
+
+* `filter` 从Stream中过滤掉不满足条件的元素
+    * 参考例子`FilterDemo`
+    
+
+
     
