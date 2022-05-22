@@ -253,8 +253,9 @@
     1. 惰性求值 ： 对应流的组成中的0个或多个中间操作。
     2. 及早求值 ： 对应的是终止操作。
     * 例如 `stream.xxx().yyyy().count()` 其中`xxx().yyyy()` 就是惰性求值，`count()`就是及早求值
-    * 在终止操作执行（）之前， 这个流中的各个中间操作是不会执行的，所以这些中间操作是惰性求值。 只有当终止操作执行， 整个流才会执行。
-       
+    * 在终止操作执行（）之前， 这个流中的各个中间操作是不会执行的，所以这些中间操作是惰性求值。 只有当终止操作执行， 整个流才会执行。（在后面将流的陷阱的时候会具体说明）
+    * 中间操作返回的对象都是stream对象例如`Stream<Student>`,`Stream<Integer>`等等
+    * 终止操作不会返回Stream。 它可能不返回值，也可能返回其他类型的值。     
 #### 流的创建方式
 1. 事例`CreateStreamDemo`中列出了集中常见的创建流的方式
 2. IntStream (LongStream, DoubleStream)的创建方式
@@ -276,7 +277,7 @@
 | limit     | 中间(有状态有界) | Stream<T>   | long                  |              |
 | map       | 中间             | Stream<R>   | Function<T,R>         | T->R         |
 | flatMap   | 中间             | Stream<R>   | Function<T,Stream<R>> | T->Stream<R> |
-| sorted    | 中间(有状态无界) | Stream<T>   | Comparator<T>         | (T,T)->int   |
+| sorted    | 中间(有状态无界) | Stream<T>   | Comparator<T>         | (T,T)->int   
 | anyMatch  | 终端             | boolean     | Predicate<T>          | T->boolean   |
 | noneMatch | 终端             | boolean     | Predicate<T>          | T->boolean   |
 | allMatch  | 终端             | boolean     | Predicate<T>          | T->boolean   |
@@ -299,6 +300,27 @@
 
 * `filter` 从Stream中过滤掉不满足条件的元素
     * 参考例子`FilterDemo`
+* 流的操作与Sql 语句特别相似， 所以在实际开发应用中， 一些sql的查询操作可以通过Stream 来完成。参考下面的下面的例子 ,从这个例子可以看出stream 的优势，只要告诉stream 做什么，不需要告诉流怎么做，这也是内部迭代的优势。
+    *  `Select * from Student where score > 80 and address = '北京' order by age desc`
+#### 流的在开发中的一些陷阱
+* 在调用及早求值操作之前， 中间操作是不会被执行的， 参考例子`MiddleOperationNotExecuted`
+* 在编写的程序汇总一旦使用了无限流，一定要先使用limit操作截断， 否则程序将会陷入死循环，知道内存耗尽参考例子`NotLimitedStream`
+* 流的短路： Stream 中的终止操作会让所有中间操作都是短路，在实际开发中，避免写出 依赖中间操作的代码。参考下面的例子，
+    * 参考例子`PrintLength5` 打出列表中长度为5的单词，对5个单词进行Map 转换，过滤（filter）。由于过findFirst的存在，在Map中的操作中的打印操作只值进行了1次，这就是stream 的短路操作, 终止操作会对中间操作进行短路。
+        * 对于这个例子， 如果我们将核心业务写到了map中，由于短路的存在，可能会出现结果不正确的情况
+#### 流的串行与并行流的比较
+1. 可以使用parallelStream 实现并行流， 开发者不用关心如何实现并行处理。
+2. 生成一个UUID ，对流的UUID 进行排序， 并比较串行、并行流的时间进行比较`ParallelStreamAndStream`
+#### Stream 的分组
+1. 分组对应的Sql语句中的GroupBy 
+2. 分组操作如果使用传统的编程方式， 非常复杂。 但是同过流的的分组方式让代码变得非常简单。
+ 
+
+### 作业
+1. 对"hello world" ,"wolrd hello","hello welcome","welcome world" 这些词组的中的单词进行去重并输出，最后的输出结果为"hello,world,welcome"(不用关单词输出的顺序)提示：使用flatmap
+    
+    
+ 
     
 
 

@@ -3,6 +3,7 @@ package com.example.jdk8.supplier;
 import java.util.function.Supplier;
 
 /**
+ *
  * {@link java.util.function.Supplier}的一个简单例子
  *
  * @Author: sizhe.chen
