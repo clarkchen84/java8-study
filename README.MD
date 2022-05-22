@@ -330,6 +330,44 @@
     * 实现Collectors.groupingBy 实现带有集计功能的分组分组 Select name, count(*) Group By name  参考demo `GroupByDeo`
 #### Stream 的分区 Partition By
 1. 分组是分区的一种特殊情况，结果只会有两个分区，这种在编程语言中只有两个分组的可以用True 和False代替，所以分区的Map 的key 是Boolean 类型 参考例子`PartitionByByDemo`
+#### Collector接口
+1. Stream 的collect 方法，是一个收集器，接受一个Collector类型的参数
+2. Collector 是一个可变的汇聚（终止）操作，它将输入元素累加到一个可变的结果容器中，它会在所有元素都处理完毕后，将累计的结果转换为一个最终的表示（这是一个可选操作），他支持传行和并行两种操作 
+3. Collectors 工具类提供了许多Collector的实现。 开发中的大部分功能都可以在Collectors 中找到实现， 只有在极少数的时候，才需要开发人员自己去实现一个Collector。
+4. 为了确保串行结果与并行结果的等价行：Collector函数需要满足两个条件
+   1. 等价性： identity ,将一个并行操作时候产生的结果放入一个空的结果容器，那么产生的结果不变
+      *. 参考Collector API描述`That is, for a partially accumulated result a that is the result of any series of accumulator and combiner invocations, a must be equivalent to combiner.apply(a, supplier.get()).`
+          既在并发时，一个汇聚的子汇聚结果a 必须满足  a ==combiner.apply(a, supplier.get())
+   2. 结合性： associativity 。 分割计算与不进行分割计算产生的两个自结果容器的合并结果 必须 与不使用 分割结算 产生相同的结果相同（想一想加法结合率），参考 java 8 源码中的java Doc，既下面例子中r1 和 r2 的结果应该是相等的
+        ``` java
+           A a1 = supplier.get();
+           accumulator.accept(a1, t1);
+           accumulator.accept(a1, t2);
+           R r1 = finisher.apply(a1);  // result without splitting
+        
+           A a2 = supplier.get();
+           accumulator.accept(a2, t1);
+           A a3 = supplier.get();
+           accumulator.accept(a3, t2);
+           R r2 = finisher.apply(combiner.apply(a2, a3));  // result with splitting
+        ```
+
+5. 一个Collector 包括了四个要实现的函数，这四个函数会协同工作，将输入汇集到一个可变容器中
+    1. `supplier` 函数： 创建一个新的结果容器
+    2.  `accumulate` 函数： 累加器，合并新的元素到结果容器
+    3. `combine` 函数：  将两个结果容器合并成一个结果容器。 与并发密切相关， 如果不是一个并发的parallelStream， 将不会使用这个处理
+    4. `finisher`函数： 对容器执行一个可选的最终转换，既，1创建的的容器，是否要转换为别的类型返回 
+
+6. Collector 接口的范型参数， Collector 接口的定义如下
+    ``` Java
+      public interface Collector<T, A, R>  
+    ```
+   1. 范型T的含义： 代表stream所在容器中元素
+7. Characteristic枚举，可以用来优化 汇聚的实现， 一旦设置了这几个枚举值。 Stream在进行 collect的汇聚操作的时候，可以直接进行按照枚举的特性决定目标函数的处理动作。例如如果设置了IDENTITY_FINISH，那么在进行汇聚操作的中结果转化的时候可以直接进行强制类型转换。
+   设置了 Unordered之后， 在ParallelStream 进行汇聚操作的时候，可以不用考虑输入元素的顺序等
+    1. Concurrent： 这个Collector支持并发操作， 能保证数据的和串行的结果相同，并且不会产生并发的问题
+    2. Unordered：Collector在进行汇聚操作的时候，不用关心输入元素的数据
+    3. IDENTITY_FINISH:`finisher`函数转换的结果 与Suppler的创建的结果容器的类型是相同的。
 
 ### 作业
 1. 对"hello world" ,"wolrd hello","hello welcome","welcome world" 这些词组的中的单词进行去重并输出，最后的输出结果为"hello,world,welcome"(不用关单词输出的顺序)提示：使用flatmap
