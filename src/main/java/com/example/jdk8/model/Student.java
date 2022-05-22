@@ -23,6 +23,14 @@ public class Student {
         this.age = 18;
     }
 
+
+    public Student(String name, int score,int age) {
+        this.name = name;
+        this.score = score;
+        this.address = "";
+        this.age = 18;
+    }
+
     public Student(String name, int score,String address,int age) {
         this.name = name;
         this.score = score;

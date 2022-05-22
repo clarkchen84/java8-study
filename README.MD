@@ -311,10 +311,25 @@
 #### 流的串行与并行流的比较
 1. 可以使用parallelStream 实现并行流， 开发者不用关心如何实现并行处理。
 2. 生成一个UUID ，对流的UUID 进行排序， 并比较串行、并行流的时间进行比较`ParallelStreamAndStream`
-#### Stream 的分组
-1. 分组对应的Sql语句中的GroupBy 
-2. 分组操作如果使用传统的编程方式， 非常复杂。 但是同过流的的分组方式让代码变得非常简单。
- 
+#### Stream 的分组Grouping By
+1. 在stream的 终止操作中使用 Collectors.groupingBy对集合进行分组，对应的Sql语句中的GroupBy 的功能 
+2. 分组操作如果使用传统的编程方式， 非常复杂。 但是通过流的的分组方式让代码变得非常简单。
+    *  例如按照名字进行分组 ：按照Select * from student group by name 
+        * 使用传统的方式：
+            1. 定义一个Map<String, List<Strudent>> 的容器
+            2. 循环Student列表
+            3. 取出每一个student的名字。检查名字是否作为key 保存在Map中
+                1. Map中不存在这个key ，那么创建一个List， 将student 放入list，并将name 作为key ，list 作为value 存入map
+                2. map 中存在key ，则取出对应的list， 将student 放入list
+            4. 返回map对象
+        * 使用Stream的Collectors.groupingBy方式参考demo `GroupByDeo`，非常简单
+            ``` java 
+            Map<String,List<Student>> studentMap = students.stream().collect(Collectors.groupingBy(Student::getName));
+            System.out.println(studentMap);
+            ```
+    * 实现Collectors.groupingBy 实现带有集计功能的分组分组 Select name, count(*) Group By name  参考demo `GroupByDeo`
+#### Stream 的分区 Partition By
+1. 分组是分区的一种特殊情况，结果只会有两个分区，这种在编程语言中只有两个分组的可以用True 和False代替，所以分区的Map 的key 是Boolean 类型 参考例子`PartitionByByDemo`
 
 ### 作业
 1. 对"hello world" ,"wolrd hello","hello welcome","welcome world" 这些词组的中的单词进行去重并输出，最后的输出结果为"hello,world,welcome"(不用关单词输出的顺序)提示：使用flatmap
