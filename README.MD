@@ -374,7 +374,7 @@
    1. 实现一个自己的`CustomerTreeSetCollectorDemo`
 
 ### 作业
-1. 对"hello world" ,"wolrd hello","hello welcome","welcome world" 这些词组的中的单词进行去重并输出，最后的输出结果为"hello,world,welcome"(不用关单词输出的顺序)提示：使用flatmap
+1. 对"hello world" ,"wolrd hello","hello welcome","welcome world" 这些词组的中的单词进行去重并输出，最后的输出结果为"hello,world,welcome"(不用关注单词输出的顺序)提示：使用flatmap
     
     
  
